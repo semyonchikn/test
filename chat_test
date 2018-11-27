@@ -1,0 +1,39 @@
+import telegram
+bot = telegram.Bot(token='638182863:AAFXlj6sfzpvRiw3_gkCUyQIn3fmtrza2So')
+print(bot.get_me())
+
+from telegram.ext import Updater
+updater = Updater(token='638182863:AAFXlj6sfzpvRiw3_gkCUyQIn3fmtrza2So')
+
+import logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
+
+def start(bot, update):
+    bot.send_message(chat_id=update.message.chat_id, text="Сейчас, я пришлю тебе код твоей пары. Нажми /give")
+    
+dispatcher = updater.dispatcher    
+
+from telegram.ext import CommandHandler
+start_handler = CommandHandler('start', start)
+dispatcher.add_handler(start_handler)
+
+
+def giveid(bot,update):
+    a=update.message.chat_id
+    bot.send_message(chat_id=update.message.chat_id, text=2*a)
+
+from telegram.ext import CommandHandler
+give_handler = CommandHandler('give', giveid)
+dispatcher.add_handler(give_handler)
+
+def takeid(bot,update):
+    bot.send_message(chat_id=update.message.chat_id, text = "Видимо у тебя уже есть пара, пришли мне ваш номер")
+
+from telegram.ext import CommandHandler
+take_handler = CommandHandler('take', takeid)
+dispatcher.add_handler(take_handler)
+    
+updater.start_polling()
+
+#updater.stop()
