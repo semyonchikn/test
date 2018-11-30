@@ -1,9 +1,9 @@
 import telegram
-bot = telegram.Bot(token='638182863:AAFXlj6sfzpvRiw3_gkCUyQIn3fmtrza2So')
+bot = telegram.Bot(token='123')
 print(bot.get_me())
 
 from telegram.ext import Updater
-updater = Updater(token='638182863:AAFXlj6sfzpvRiw3_gkCUyQIn3fmtrza2So')
+updater = Updater(token='123')
 
 import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -11,7 +11,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 def start(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="Сейчас, я пришлю тебе код твоей пары. Нажми /give")
-    
+    AAFXlj6sfzpvRiw3_gkCUyQIn3fmtrza2So
 dispatcher = updater.dispatcher    
 
 from telegram.ext import CommandHandler
