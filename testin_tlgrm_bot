@@ -1,0 +1,64 @@
+import telegram
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
+                          ConversationHandler)
+from telegram import ReplyKeyboardMarkup
+import logging
+
+bot = telegram.Bot(token='123')
+print(bot.get_me())
+
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
+
+reply_keyboard = [['Your ID', 'Your pare ID'],
+                  ['Your tasks', 'Task for tonight'],
+                  ['Done']]
+markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+
+updater = Updater(token='638182863:AAFXlj6sfzpvRiw3_gkCUyQIn3fmtrza2So')
+dispatcher = updater.dispatcher    
+
+
+
+def start(bot, update):
+    bot.send_message(chat_id=update.message.chat_id, text="Сейчас, я пришлю тебе код твоей пары. Нажми /give", reply_markup=markup)
+    return CHOOSING
+    
+    
+    
+start_handler = CommandHandler('start', start)
+dispatcher.add_handler(start_handler)
+
+
+def giveid(bot,update):
+    a=update.message.chat_id
+    bot.send_message(chat_id=update.message.chat_id, text=2*a)
+
+give_handler = CommandHandler('give', giveid)
+dispatcher.add_handler(give_handler)
+
+ID = 0
+def takeid(bot,update):
+    ID = update.message.text
+    bot.send_message(chat_id=update.message.chat_id, text = "ага")
+    
+take_handler = CommandHandler('take', takeid)
+dispatcher.add_handler(take_handler)
+    
+    
+def unknown(bot, update):
+    bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
+
+unknown_handler = MessageHandler(Filters.command, unknown)
+dispatcher.add_handler(unknown_handler)
+
+#print(args)
+
+             
+    
+    
+    
+updater.start_polling()
+
+#updater.stop()
