@@ -1,0 +1,170 @@
+token='777694118:AAG2KG7XO2EaTJLT8h2K2gvKlDr44Ru5Yak'
+
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from telegram.ext import Updater
+from telegram.ext import CommandHandler, CallbackQueryHandler, MessageHandler, Filters , ConversationHandler,RegexHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
+############################### Bot ############################################
+def main():
+    updater = Updater(token)
+
+    updater.dispatcher.add_handler(CommandHandler('start', start))
+    updater.dispatcher.add_handler(CallbackQueryHandler(main_menu, pattern='main'))
+    updater.dispatcher.add_handler(CallbackQueryHandler(first_menu, pattern='new'))
+    updater.dispatcher.add_handler(CallbackQueryHandler(info, pattern='info'))
+    #updater.dispatcher.add_handler(CallbackQueryHandler(second_menu, pattern='join'))
+    updater.dispatcher.add_handler(CallbackQueryHandler(echo, pattern='join'))
+    updater.dispatcher.add_error_handler(error)
+
+    TYPING_CHOICE = range(1)
+
+    conv_handler = ConversationHandler(
+        entry_points=[CallbackQueryHandler(second_menu, pattern='join')],
+          states={
+
+           TYPING_CHOICE: [MessageHandler(Filters.text,
+                                          echo)
+                            ]
+        },
+       fallbacks=[RegexHandler('^Done$', done, pass_user_data=True)]
+
+    )
+    
+#    updater.dispatcher.add_handler(MessageHandler(Filters.text, echo))
+
+
+    updater.dispatcher.add_handler(conv_handler)
+
+    updater.start_polling()
+
+
+
+
+
+def error(bot, update, error):
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
+
+def start(bot, update):
+  update.message.reply_text(main_menu_message(),
+                            reply_markup=main_menu_keyboard())
+
+def main_menu(bot, update):
+  query = update.callback_query
+  bot.send_message(chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        text=main_menu_message(),
+                        reply_markup=main_menu_keyboard())
+
+def main_menu_message():
+  return 'Choose the option to continue: \n' \
+         'либо создай ключ для входа либо войди с чужого'
+
+def main_menu_keyboard():
+  keyboard = [[InlineKeyboardButton('Generate', callback_data='new')],
+              [InlineKeyboardButton('Join', callback_data='join')]]
+  return InlineKeyboardMarkup(keyboard)
+
+
+def first_menu(bot, update):
+  query = update.callback_query
+
+  print (query.message.chat_id)
+  print("user generate new nonactive couple")
+
+  bot.edit_message_text(chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        text="Вы решили создать новую пару, пришлите этот код своей половинке")
+
+  bot.send_message(chat_id=query.message.chat_id,
+                   message_id=query.message.message_id,
+                   text=query.message.chat_id,
+                   reply_markup=info_keyboard())
+
+def info_keyboard():
+  keyboard = [[InlineKeyboardButton('Узнать че вообще тут твориться', callback_data='info')]]
+  return InlineKeyboardMarkup(keyboard)
+
+def info(bot, update):
+  query = update.callback_query
+  bot.edit_message_text(chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        text="это нужно для товалрвырапвыароиыварьиывьаиывавыьаиывб ваш код все тот же{}".format(query.message.chat_id) ,
+                        reply_markup=info_keyboard())
+
+def echo(bot, update):
+  """вызывается любым текстом от собеседника, но не командой файлом итп
+  отвечает эхом
+  """
+  print ("echo")
+  t=update.message.text
+  print (t)
+  update.message.reply_text(text)
+
+def second_menu(bot, update):
+  query = update.callback_query
+
+  print (query.message.chat_id)
+  print("user try to join couple")
+
+  bot.edit_message_text(chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        text="Вы решили присоедениться к пару пару, введите код полученный от неё")
+
+
+
+
+def done(bot, update, user_data):
+    if 'choice' in user_data:
+        del user_data['choice']
+
+    update.message.reply_text("I learned these facts about you:"
+                              "{}"
+                              "Until next time!".format(facts_to_str(user_data)))
+
+    user_data.clear()
+    return ConversationHandler.END
+
+
+############################ Keyboards #########################################
+
+def first_menu_keyboard():
+  keyboard = [[InlineKeyboardButton('Submenu 1-1', callback_data='m1_1')],
+              [InlineKeyboardButton('Submenu 1-2', callback_data='m1_2')],
+              [InlineKeyboardButton('Main menu', callback_data='main')]]
+  return InlineKeyboardMarkup(keyboard)
+
+
+
+def second_menu_keyboard():
+  keyboard = [[InlineKeyboardButton('Submenu 2-1', callback_data='m2_1')],
+              [InlineKeyboardButton('Submenu 2-2', callback_data='m2_2')],
+              [InlineKeyboardButton('Main menu', callback_data='main')]]
+  return InlineKeyboardMarkup(keyboard)
+
+############################# Messages #########################################
+
+def first_menu_message():
+  return 'Choose the submenu in first menu:'
+
+def second_menu_message():
+  return 'Choose the submenu in second menu:'
+
+############################# Handlers #########################################
+
+def giveid(bot,update):
+    a=update.message.chat_id
+    bot.send_message(chat_id=update.message.chat_id, text=2*a)
+
+#
+
+
+
+main()
